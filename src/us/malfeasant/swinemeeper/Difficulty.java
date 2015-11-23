@@ -1,24 +1,20 @@
 package us.malfeasant.swinemeeper;
 
-import java.util.prefs.Preferences;
-
 public enum Difficulty {
 	EASY(8, 8, 10), MEDIUM(16, 16, 40), HARD(40, 20, 99), CUSTOM(0, 0, 0) {
 		@Override
-		public int getHeight() {
-			return prefs.getInt("CustomHeight", 5);
+		public int getWidth() {
+			return Persist.getCustomWidth();
 		}
 		@Override
-		public int getWidth() {
-			return prefs.getInt("CustomWidth", 5);
+		public int getHeight() {
+			return Persist.getCustomHeight();
 		}
 		@Override
 		public int getMines() {
-			return prefs.getInt("CustomMines", 5);
+			return Persist.getCustomMines();
 		}
 	};
-	
-	private static Preferences prefs = Preferences.userNodeForPackage(Difficulty.class);
 	
 	private final int width;
 	private final int height;
@@ -40,15 +36,4 @@ public enum Difficulty {
 		return mines;
 	}
 	
-	public static Difficulty loadDifficulty() {
-		return Difficulty.valueOf(prefs.get(Difficulty.class.getSimpleName(), Difficulty.EASY.name()));
-	}
-	public static void storeDifficulty(Difficulty d) {
-		prefs.put(Difficulty.class.getSimpleName(), d.name());
-	}
-	public static void setCustom(int width, int height, int mines) {
-		prefs.putInt("CustomWidth", width);
-		prefs.putInt("CustomHeight", height);
-		prefs.putInt("CustomMines", mines);
-	}
 }

@@ -7,7 +7,7 @@ public class Launcher extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		Difficulty diff = Difficulty.loadDifficulty();
+		Difficulty diff = Persist.loadDifficulty();
 	}
 
 }
