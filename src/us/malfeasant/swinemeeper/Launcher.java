@@ -17,7 +17,6 @@ public class Launcher extends Application {
 	private final Label mineLabel = new Label("000");
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		Difficulty diff = Persist.loadDifficulty();
 		Button go = new Button("Go");
 		go.setOnAction(e -> newGame());
 		BorderPane pane = new BorderPane();
@@ -35,11 +34,22 @@ public class Launcher extends Application {
 	private void newGame() {
 		gameGrid.getChildren().clear();
 		Difficulty diff = Persist.loadDifficulty();
+		Cell[][] cells = new Cell[diff.getWidth()][diff.getHeight()];
 		for (int y = 0; y < diff.getHeight(); ++y) {
 			for (int x = 0; x < diff.getWidth(); ++x) {
-				gameGrid.add(new Button(" "), x, y);
+				Cell c = new Cell();
+				if (x > 0) {
+					c.setNeighbor(Direction.WEST, cells[x-1][y]);
+				}
+				if (y > 0) {
+					c.setNeighbor(Direction.NORTH, cells[x][y-1]);
+				}
+				if ((x > 0) && (y > 0)) {
+					c.setNeighbor(Direction.NORTHWEST, cells[x-1][y-1]);
+				}
+				gameGrid.add(c.getButton(), x, y);
+				cells[x][y] = c;
 			}
 		}
-		
 	}
 }
