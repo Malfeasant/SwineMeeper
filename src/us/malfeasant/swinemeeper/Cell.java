@@ -16,12 +16,15 @@ public class Cell {
 	private final Button btn = new Button(" ");
 	private boolean isMine = false;
 	
+	Cell() {
+		btn.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+	}
 	void setMine() {
 		isMine = true;
 	}
 	void setNeighbor(Direction d, Cell c) {
 		buttonMap.put(d, c);
-		c.setNeighbor(d.getOpposite(), this);
+		c.buttonMap.put(d.getOpposite(), this);
 	}
 	Button getButton() {
 		return btn;
