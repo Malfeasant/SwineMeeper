@@ -4,15 +4,15 @@ public enum Difficulty {
 	EASY(8, 8, 10), MEDIUM(16, 16, 40), HARD(30, 16, 99), CUSTOM(0, 0, 0) {
 		@Override
 		public int getWidth() {
-			return Persist.getCustomWidth();
+			return Persist.getWidth();
 		}
 		@Override
 		public int getHeight() {
-			return Persist.getCustomHeight();
+			return Persist.getHeight();
 		}
 		@Override
 		public int getMines() {
-			return Persist.getCustomMines();
+			return Persist.getMines();
 		}
 	};
 	
