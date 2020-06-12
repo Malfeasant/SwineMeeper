@@ -1,5 +1,8 @@
 package us.malfeasant.swinemeeper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -64,7 +67,7 @@ public class Launcher extends Application {
 		gameGrid.getRowConstraints().clear();
 		
 		Difficulty diff = Persist.loadDifficulty();
-		Cell[][] cells = new Cell[diff.getWidth()][diff.getHeight()];
+		ArrayList<Cell> cells = new ArrayList<>(diff.getWidth() * diff.getHeight());
 		
 		// allow buttons to resize to fill window:
 		RowConstraints rc = new RowConstraints();
@@ -82,33 +85,42 @@ public class Launcher extends Application {
 			gameGrid.getColumnConstraints().add(cc);
 		}
 		
+		// Create bomb cells first, then create remainder unbombed cells, shuffle them, then put them in place
+		for (int i = 0; i < diff.getWidth() * diff.getHeight(); i++) {
+			Cell e = new Cell();
+			if (i < diff.getMines()) e.setMine();
+			cells.add(e);
+		}
+		Collections.shuffle(cells);
+		
 		// Top left corner
-		Cell c = new Cell();
-		cells[0][0] = c;
+		Cell c = cells.get(0);
 		gameGrid.add(c.getButton(), 0, 0);
 		
 		// Top row
 		for (int x = 1; x < diff.getWidth(); ++x) {
-			c = new Cell();
+			c = cells.get(x);
 			gameGrid.add(c.getButton(), x, 0);
-			cells[x][0] = c;
-			c.setNeighbor(Direction.WEST, cells[x-1][0]);
+			c.setNeighbor(Direction.WEST, cells.get(x-1));
 		}
 		
 		// Remaining rows
 		for (int y = 1; y < diff.getHeight(); ++y) {
 			// Left cell
-			c = new Cell();
-			cells[0][y] = c;
+			c = cells.get(y * diff.getWidth());
 			gameGrid.add(c.getButton(), 0, y);
-			c.setNeighbor(Direction.NORTH, cells[0][y-1]);
+			c.setNeighbor(Direction.NORTH, cells.get((y-1) * diff.getWidth()));
+			c.setNeighbor(Direction.NORTHEAST, cells.get(1 + (y-1) * diff.getWidth()));
 			
 			// Remaining cells
 			for (int x = 1; x < diff.getWidth(); ++x) {
-				c = new Cell();
-				c.setNeighbor(Direction.NORTHWEST, cells[x-1][y-1]);
+				c = cells.get(x + y * diff.getWidth());
+				c.setNeighbor(Direction.NORTH, cells.get(x + (y-1) * diff.getWidth()));
+				c.setNeighbor(Direction.NORTHWEST, cells.get((x-1) + (y-1) * diff.getWidth()));
+				c.setNeighbor(Direction.WEST, cells.get((x-1) + y * diff.getWidth()));
+				if (x < diff.getWidth() - 1)	// don't do this on last column
+					c.setNeighbor(Direction.NORTHEAST, cells.get(x + 1 + (y-1) * diff.getWidth()));
 				gameGrid.add(c.getButton(), x, y);
-				cells[x][y] = c;
 			}
 		}
 		stage.sizeToScene();	// Resize window to fit size of gameGrid
