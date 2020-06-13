@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javafx.application.Application;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -21,15 +23,26 @@ public class Launcher extends Application {
 		launch(args);
 	}
 	private final GridPane gameGrid = new GridPane();
-	private final Label timeLabel = new Label("000");
-	private final Label mineLabel = new Label("000");
+	private final Label timeLabel = new Label();
+	private final Label mineLabel = new Label();
 	private Stage stage;	// need this to resize window after adding/removing children- is there a better way?
+	private GameState state;	// tracks state of game- can be READY (gameboard is built, but waiting for first click),
+	// RUNNING (board has been clicked on, so timers are running), WON (all non-mine cells uncovered), LOST (hit a mine)
+	private ArrayList<Cell> cells;
+	private int uncovered;	// number of uncovered mines- when this reaches total cells - mines, game must be won
+	private int goal;	// number of non-mined cells
+	
+	private final IntegerProperty timeProp = new SimpleIntegerProperty();
+	private final IntegerProperty mineProp = new SimpleIntegerProperty();
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		stage = primaryStage;
 		Button go = new Button("Go");
 		go.setOnAction(e -> newGame());
+		
+		timeLabel.textProperty().bind(timeProp.asString("%03d"));
+		mineLabel.textProperty().bind(mineProp.asString("%03d"));
 		
 		GridPane topGrid = new GridPane();	// counters & go button
 		// All this is needed to keep counters at the outside edges of the bar and go button centered:
@@ -43,9 +56,9 @@ public class Launcher extends Application {
 		ccR.setPercentWidth(100);
 		ccR.setHalignment(HPos.RIGHT);
 		topGrid.getColumnConstraints().addAll(ccL, ccC, ccR);
-		topGrid.add(timeLabel, 0, 0);
+		topGrid.add(mineLabel, 0, 0);
 		topGrid.add(go, 1, 0);
-		topGrid.add(mineLabel, 2, 0);
+		topGrid.add(timeLabel, 2, 0);	// oops- had these backwards
 		timeLabel.setPadding(new Insets(5));	// keeps it from getting smushed to the edge
 		mineLabel.setPadding(new Insets(5));
 		
@@ -65,9 +78,13 @@ public class Launcher extends Application {
 		gameGrid.getChildren().clear();
 		gameGrid.getColumnConstraints().clear();
 		gameGrid.getRowConstraints().clear();
+		timeProp.set(0);
 		
 		Difficulty diff = Persist.loadDifficulty();
-		ArrayList<Cell> cells = new ArrayList<>(diff.getWidth() * diff.getHeight());
+		mineProp.set(diff.getMines());
+		cells = new ArrayList<>(diff.getWidth() * diff.getHeight());
+		uncovered = 0;
+		goal = diff.getHeight() * diff.getWidth() - diff.getMines();
 		
 		// allow buttons to resize to fill window:
 		RowConstraints rc = new RowConstraints();
@@ -87,7 +104,7 @@ public class Launcher extends Application {
 		
 		// Create bomb cells first, then create remainder unbombed cells, shuffle them, then put them in place
 		for (int i = 0; i < diff.getWidth() * diff.getHeight(); i++) {
-			Cell e = new Cell();
+			Cell e = new Cell(this);
 			if (i < diff.getMines()) e.setMine();
 			cells.add(e);
 		}
@@ -123,8 +140,39 @@ public class Launcher extends Application {
 				gameGrid.add(c.getButton(), x, y);
 			}
 		}
+		
+		state = GameState.READY;
+		
 		stage.sizeToScene();	// Resize window to fit size of gameGrid
 		stage.setMinHeight(stage.getHeight());	// let it be resized, but don't let it get any smaller than this
 		stage.setMinWidth(stage.getWidth());	// (shouldn't this already happen?)
+	}
+	
+	void click(MineAction a) {	// gameboard has to know about clicks and right clicks to start timer, track flagged mines...
+		if (state.allowClicks()) {
+			switch (a) {
+			case MARK:	// these alone do not start the game
+				mineProp.set(mineProp.get() - 1);	// goes negative if more marks than mines, that's ok
+				break;
+			case UNMARK:
+				mineProp.set(mineProp.get() + 1);
+				break;
+			case UNCOVER:
+				state = GameState.RUNNING;
+				// TODO: start timer? or make this another property which has that effect?
+				uncovered++;
+				if (uncovered == goal) {
+					cells.forEach(c -> c.endGame(true));
+					state = GameState.WON;
+					// TODO: stop timer?
+				}
+				break;
+			case KABOOM:
+				state = GameState.LOST;
+				// TODO: stop timer?
+				cells.forEach(c -> c.endGame(false));
+				break;
+			}
+		}
 	}
 }

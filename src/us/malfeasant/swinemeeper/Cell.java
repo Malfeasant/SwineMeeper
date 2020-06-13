@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -18,12 +19,15 @@ public class Cell {
 	private static String WRONG = "X";
 	private static String BOMB = "*";	// 1f4a3?
 	
-	private final Map<Direction, Cell> buttonMap = new EnumMap<>(Direction.class);
+	private final Map<Direction, Cell> neighborMap = new EnumMap<>(Direction.class);
 	private final Button btn = new Button(SPACE);
 	private boolean isMine = false;
 	private boolean isFlag = false;
 	
-	Cell() {
+	private final Launcher game;	// need to have a reference to notify of clicks and
+	
+	Cell(Launcher g) {
+		game = g;
 		btn.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		btn.setOnMouseClicked(e -> action(e));
 	}
@@ -31,16 +35,17 @@ public class Cell {
 		isMine = true;
 	}
 	void setNeighbor(Direction d, Cell c) {
-		buttonMap.put(d, c);
-		c.buttonMap.put(d.getOpposite(), this);
+		neighborMap.put(d, c);
+		c.neighborMap.put(d.getOpposite(), this);
 	}
 	Button getButton() {
 		return btn;
 	}
-	
 	void action(MouseEvent e) {
-		// TODO: signal the gameboard to start timer if this is first click
-		switch (e.getButton()) {
+		action(e.getButton());
+	}
+	void action(MouseButton b) {
+		switch (b) {
 		case MIDDLE:	// don't think we care...
 			break;
 		case NONE:	// shouldn't happen...
@@ -49,11 +54,13 @@ public class Cell {
 			if (!isFlag) {	// flag suppresses a click
 				if (isMine) {
 					btn.setStyle("-fx-background-color: red");
-					System.out.println("Boom");	// TODO: end the game
+					game.click(MineAction.KABOOM);
 				} else {
+					btn.setDisable(true);
+					game.click(MineAction.UNCOVER);
 					int neighborMines = checkNeighbors();
 					if (neighborMines == 0) {
-						// TODO: recursively propagate click to all neighbors, avoiding endless loop
+						clickNeighbors();
 					} else {
 						btn.setText("" + neighborMines);
 					}
@@ -63,28 +70,37 @@ public class Cell {
 		case SECONDARY:
 			isFlag = !isFlag;
 			btn.setText(isFlag ? FLAG : SPACE);
-			// TODO: update the mine counter
+			game.click(isFlag ? MineAction.MARK : MineAction.UNMARK);
 			break;
-		default:
-			break;
-		
 		}
 	}
 	
 	int checkNeighbors() {
-		int count = 0;
-		for (Cell c : buttonMap.values()) {
-			if (c.isMine) count++;
-		}
-		return count;
+		return (int) neighborMap.values().stream().filter(c -> c.isMine).count();
 	}
 	
-	void endGame() {
+	void clickNeighbors() {	// gets called on each cell for which checkNeighbors() returns 0
+		//		neighborMap.values().stream().filter(c -> !c.btn.isDisabled()).forEach(c -> c.btn.fire());
+		for (Cell c : neighborMap.values()) {
+			if (!c.btn.isDisabled()) {	// avoids the endless loop?
+				c.action(MouseButton.PRIMARY);	// can't use fire() method since that fires an Action not a MouseEvent...
+			}
+		}
+	}
+	
+	void endGame(boolean won) {	// losing the game freezes the mine counter- win reduces it to 0
+		// also win or lose the mines are revealed but with flags for a win, bombs for a loss
+		btn.setOnMouseClicked(null);	// is there a better way to disallow clicking without changing its appearance?
 		if (isFlag & !isMine) {
 			btn.setText(WRONG);
 		}
 		if (!isFlag & isMine) {
-			btn.setText(BOMB);
+			if (won) {
+				btn.setText(FLAG);
+				game.click(MineAction.MARK);
+			} else {
+				btn.setText(BOMB);
+			}
 		}
 	}
 }
