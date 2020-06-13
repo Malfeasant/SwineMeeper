@@ -32,7 +32,7 @@ public class Launcher extends Application {
 	private int uncovered;	// number of uncovered mines- when this reaches total cells - mines, game must be won
 	private int goal;	// number of non-mined cells
 	
-	private final IntegerProperty timeProp = new SimpleIntegerProperty();
+	private final Timer timer = new Timer();
 	private final IntegerProperty mineProp = new SimpleIntegerProperty();
 	
 	@Override
@@ -41,7 +41,7 @@ public class Launcher extends Application {
 		Button go = new Button("Go");
 		go.setOnAction(e -> newGame());
 		
-		timeLabel.textProperty().bind(timeProp.asString("%03d"));
+		timeLabel.textProperty().bind(timer.timeProperty().asString("%03d"));
 		mineLabel.textProperty().bind(mineProp.asString("%03d"));
 		
 		GridPane topGrid = new GridPane();	// counters & go button
@@ -78,7 +78,7 @@ public class Launcher extends Application {
 		gameGrid.getChildren().clear();
 		gameGrid.getColumnConstraints().clear();
 		gameGrid.getRowConstraints().clear();
-		timeProp.set(0);
+		timer.reset();
 		
 		Difficulty diff = Persist.loadDifficulty();
 		mineProp.set(diff.getMines());
@@ -159,17 +159,17 @@ public class Launcher extends Application {
 				break;
 			case UNCOVER:
 				state = GameState.RUNNING;
-				// TODO: start timer? or make this another property which has that effect?
+				timer.start();
 				uncovered++;
 				if (uncovered == goal) {
 					cells.forEach(c -> c.endGame(true));
 					state = GameState.WON;
-					// TODO: stop timer?
+					timer.stop();
 				}
 				break;
 			case KABOOM:
 				state = GameState.LOST;
-				// TODO: stop timer?
+				timer.stop();
 				cells.forEach(c -> c.endGame(false));
 				break;
 			}
