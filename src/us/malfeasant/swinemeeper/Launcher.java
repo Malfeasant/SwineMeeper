@@ -90,6 +90,7 @@ public class Launcher extends Application {
 		gameGrid.getChildren().clear();
 		gameGrid.getColumnConstraints().clear();
 		gameGrid.getRowConstraints().clear();
+		timer.stop();
 		timer.reset();
 		
 		Difficulty diff = Persist.loadDifficulty();
