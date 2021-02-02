@@ -6,16 +6,12 @@ import java.util.Collections;
 import javafx.application.Application;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -40,10 +36,12 @@ public class Launcher extends Application {
 	private final Timer timer = new Timer();
 	private final IntegerProperty mineProp = new SimpleIntegerProperty();
 	
+	private final Button go = new Button("Go");	// has to be here so it can be "clicked" from event handler
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		stage = primaryStage;
-		Button go = new Button("Go");
+//		Button go = new Button("Go");
 		go.setOnAction(e -> newGame());
 		
 		timeLabel.textProperty().bind(timer.timeProperty().asString("%03d"));
@@ -67,18 +65,7 @@ public class Launcher extends Application {
 		timeLabel.setPadding(new Insets(5));	// keeps it from getting smushed to the edge
 		mineLabel.setPadding(new Insets(5));
 		
-		ToggleGroup group = new ToggleGroup();
-		MenuBar bar = MenuBuilder.build(group);
-		group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-			@Override
-			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-				if (newValue.getUserData() == Difficulty.CUSTOM) {
-					// TODO pop up a dialog for custom dimensions
-				}
-				Persist.storeDifficulty((Difficulty)(newValue.getUserData()));
-				go.fire();	// changing difficulty starts a new game
-			}
-		});
+		MenuBar bar = MenuBuilder.build(this);
 		VBox box = new VBox(bar, topGrid, gameGrid);
 		// this is needed to allow the gameGrid to fill the remaining space when resized
 		VBox.setVgrow(gameGrid, Priority.ALWAYS);
@@ -88,6 +75,14 @@ public class Launcher extends Application {
 		primaryStage.setTitle("SwineMeeper");
 		primaryStage.show();
 		go.fire();
+	}
+	
+	void setDifficulty(Difficulty diff) {
+		Persist.storeDifficulty(diff);
+		if (diff == Difficulty.CUSTOM) {
+			// TODO pop up a dialog for custom dimensions
+		}
+		go.fire();	// changing difficulty starts a new game
 	}
 	
 	private void newGame() {
