@@ -1,10 +1,12 @@
 package us.malfeasant.swinemeeper;
 
+import java.util.Optional;
+
 public enum Difficulty {
 	EASY(8, 8, 10), MEDIUM(16, 16, 40), HARD(30, 16, 99), CUSTOM(0, 0, 0) {
 		@Override
-		public Triple getTriple() {
-			return new Triple(Persist.getWidth(), Persist.getHeight(), Persist.getMines());
+		public Optional<Triple> getTriple() {
+			return Optional.empty();
 		}
 	};
 	
@@ -14,7 +16,7 @@ public enum Difficulty {
 		triple = new Triple(w, h, m);
 	}
 	
-	public Triple getTriple() {
-		return triple;
+	public Optional<Triple> getTriple() {
+		return Optional.of(triple);
 	}
 }

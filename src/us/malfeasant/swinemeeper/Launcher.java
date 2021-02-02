@@ -93,7 +93,7 @@ public class Launcher extends Application {
 		timer.reset();
 		
 		Difficulty diff = Persist.loadDifficulty();
-		Triple t = diff.getTriple();
+		Triple t = Persist.getDimensions(diff);
 		mineProp.set(t.mines);
 		cells = new ArrayList<>(t.width * t.height);
 		uncovered = 0;

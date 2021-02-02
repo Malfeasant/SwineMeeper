@@ -14,19 +14,21 @@ public class CustomDialog {
 		dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
 		GridPane pane = new GridPane();
 		
+		Triple existing = Persist.getDimensions(Difficulty.CUSTOM);
+		
 		TextField height = new TextField();
-		height.setText("" + Persist.getHeight());
+		height.setText("" + existing.height);
 		pane.add(new Label("Height:"), 0, 0);
 		pane.add(height, 1, 0);
 		Platform.runLater(() -> height.requestFocus());	// Save user the trouble of clicking the first field...
 		
 		TextField width = new TextField();
-		width.setText("" + Persist.getWidth());
+		width.setText("" + existing.width);
 		pane.add(new Label("Width:"), 0, 1);
 		pane.add(width, 1, 1);
 		
 		TextField mines = new TextField();
-		mines.setText("" + Persist.getMines());
+		mines.setText("" + existing.mines);
 		pane.add(new Label("Mines:"), 0, 2);
 		pane.add(mines, 1, 2);
 		
