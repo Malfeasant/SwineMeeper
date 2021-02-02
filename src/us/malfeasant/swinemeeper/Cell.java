@@ -96,11 +96,9 @@ public class Cell {
 		}
 		if (!isFlag & isMine) {
 			if (won) {
-				btn.setText(FLAG);
 				game.click(MineAction.MARK);
-			} else {
-				btn.setText(BOMB);
 			}
+			btn.setText(won ? FLAG : BOMB);
 		}
 	}
 }
