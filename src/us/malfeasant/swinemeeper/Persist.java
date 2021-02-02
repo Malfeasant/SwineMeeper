@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import javafx.scene.control.Dialog;
-import us.malfeasant.swinemeeper.CustomDialog.Triple;
 
 public class Persist {
 	private static Preferences prefs = Preferences.userNodeForPackage(Persist.class);
@@ -22,7 +21,8 @@ public class Persist {
 				setStuff(triple.width, triple.height, triple.mines);
 			});
 		} else {
-			setStuff(d.getWidth(), d.getHeight(), d.getMines());
+			Triple t = d.getTriple();
+			setStuff(t.width, t.height, t.mines);
 		}
 	}
 	

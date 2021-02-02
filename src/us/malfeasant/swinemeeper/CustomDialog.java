@@ -8,15 +8,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 public class CustomDialog {
-	public static class Triple {
-		public final int width;
-		public final int height;
-		public final int mines;
-		private Triple(int w, int h, int m) {
-			width = w; height = h; mines = m;
-		}
-	}
-	
 	public static Dialog<Triple> build() {
 		Dialog<Triple> dialog = new Dialog<>();
 		dialog.setTitle("Custom Board");

@@ -93,10 +93,11 @@ public class Launcher extends Application {
 		timer.reset();
 		
 		Difficulty diff = Persist.loadDifficulty();
-		mineProp.set(diff.getMines());
-		cells = new ArrayList<>(diff.getWidth() * diff.getHeight());
+		Triple t = diff.getTriple();
+		mineProp.set(t.mines);
+		cells = new ArrayList<>(t.width * t.height);
 		uncovered = 0;
-		goal = diff.getHeight() * diff.getWidth() - diff.getMines();
+		goal = t.height * t.width - t.mines;
 		
 		// allow buttons to resize to fill window:
 		RowConstraints rc = new RowConstraints();
@@ -107,17 +108,17 @@ public class Launcher extends Application {
 		gameGrid.getColumnConstraints().add(cc);
 		
 		// We need to set the constraint object for each row and column, though they can be the same...
-		for (int i=0; i < diff.getHeight() - 1; i++) {
+		for (int i=0; i < t.height - 1; i++) {
 			gameGrid.getRowConstraints().add(rc);
 		}
-		for (int i=0; i < diff.getWidth() - 1; i++) {
+		for (int i=0; i < t.width - 1; i++) {
 			gameGrid.getColumnConstraints().add(cc);
 		}
 		
 		// Create bomb cells first, then create remainder unbombed cells, shuffle them, then put them in place
-		for (int i = 0; i < diff.getWidth() * diff.getHeight(); i++) {
+		for (int i = 0; i < t.width * t.height; i++) {
 			Cell e = new Cell(this);
-			if (i < diff.getMines()) e.setMine();
+			if (i < t.mines) e.setMine();
 			cells.add(e);
 		}
 		Collections.shuffle(cells);
@@ -127,28 +128,28 @@ public class Launcher extends Application {
 		gameGrid.add(c.getButton(), 0, 0);
 		
 		// Top row
-		for (int x = 1; x < diff.getWidth(); ++x) {
+		for (int x = 1; x < t.width; ++x) {
 			c = cells.get(x);
 			gameGrid.add(c.getButton(), x, 0);
 			c.setNeighbor(Direction.WEST, cells.get(x-1));
 		}
 		
 		// Remaining rows
-		for (int y = 1; y < diff.getHeight(); ++y) {
+		for (int y = 1; y < t.height; ++y) {
 			// Left cell
-			c = cells.get(y * diff.getWidth());
+			c = cells.get(y * t.width);
 			gameGrid.add(c.getButton(), 0, y);
-			c.setNeighbor(Direction.NORTH, cells.get((y-1) * diff.getWidth()));
-			c.setNeighbor(Direction.NORTHEAST, cells.get(1 + (y-1) * diff.getWidth()));
+			c.setNeighbor(Direction.NORTH, cells.get((y-1) * t.width));
+			c.setNeighbor(Direction.NORTHEAST, cells.get(1 + (y-1) * t.width));
 			
 			// Remaining cells
-			for (int x = 1; x < diff.getWidth(); ++x) {
-				c = cells.get(x + y * diff.getWidth());
-				c.setNeighbor(Direction.NORTH, cells.get(x + (y-1) * diff.getWidth()));
-				c.setNeighbor(Direction.NORTHWEST, cells.get((x-1) + (y-1) * diff.getWidth()));
-				c.setNeighbor(Direction.WEST, cells.get((x-1) + y * diff.getWidth()));
-				if (x < diff.getWidth() - 1)	// don't do this on last column
-					c.setNeighbor(Direction.NORTHEAST, cells.get(x + 1 + (y-1) * diff.getWidth()));
+			for (int x = 1; x < t.width; ++x) {
+				c = cells.get(x + y * t.width);
+				c.setNeighbor(Direction.NORTH, cells.get(x + (y-1) * t.width));
+				c.setNeighbor(Direction.NORTHWEST, cells.get((x-1) + (y-1) * t.width));
+				c.setNeighbor(Direction.WEST, cells.get((x-1) + y * t.width));
+				if (x < t.width - 1)	// don't do this on last column
+					c.setNeighbor(Direction.NORTHEAST, cells.get(x + 1 + (y-1) * t.width));
 				gameGrid.add(c.getButton(), x, y);
 			}
 		}

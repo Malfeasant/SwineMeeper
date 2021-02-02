@@ -3,37 +3,18 @@ package us.malfeasant.swinemeeper;
 public enum Difficulty {
 	EASY(8, 8, 10), MEDIUM(16, 16, 40), HARD(30, 16, 99), CUSTOM(0, 0, 0) {
 		@Override
-		public int getWidth() {
-			return Persist.getWidth();
-		}
-		@Override
-		public int getHeight() {
-			return Persist.getHeight();
-		}
-		@Override
-		public int getMines() {
-			return Persist.getMines();
+		public Triple getTriple() {
+			return new Triple(Persist.getWidth(), Persist.getHeight(), Persist.getMines());
 		}
 	};
 	
-	private final int width;
-	private final int height;
-	private final int mines;
+	private final Triple triple;
 	
 	private Difficulty(int w, int h, int m) {
-		width = w;
-		height = h;
-		mines = m;
+		triple = new Triple(w, h, m);
 	}
 	
-	public int getWidth() {
-		return width;
+	public Triple getTriple() {
+		return triple;
 	}
-	public int getHeight() {
-		return height;
-	}
-	public int getMines() {
-		return mines;
-	}
-	
 }
