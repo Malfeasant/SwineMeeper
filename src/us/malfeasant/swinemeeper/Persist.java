@@ -1,20 +1,32 @@
 package us.malfeasant.swinemeeper;
 
+import java.util.Optional;
 import java.util.prefs.Preferences;
+
+import javafx.scene.control.Dialog;
+import us.malfeasant.swinemeeper.CustomDialog.Triple;
 
 public class Persist {
 	private static Preferences prefs = Preferences.userNodeForPackage(Persist.class);
 	
 	public static Difficulty loadDifficulty() {
 		Difficulty d = Difficulty.valueOf(prefs.get(Difficulty.class.getSimpleName(), Difficulty.EASY.name()));
-		if (d != Difficulty.CUSTOM) setStuff(d.getWidth(), d.getHeight(), d.getMines());
 		return d;
 	}
 	public static void storeDifficulty(Difficulty d) {
 		prefs.put(Difficulty.class.getSimpleName(), d.name());
+		if (d == Difficulty.CUSTOM) {
+			Dialog<Triple> dialog = CustomDialog.build();
+			Optional<Triple> result = dialog.showAndWait();
+			result.ifPresent(triple -> {
+				setStuff(triple.width, triple.height, triple.mines);
+			});
+		} else {
+			setStuff(d.getWidth(), d.getHeight(), d.getMines());
+		}
 	}
 	
-	public static void setStuff(int width, int height, int mines) {
+	private static void setStuff(int width, int height, int mines) {
 		prefs.putInt("Width", width);
 		prefs.putInt("Height", height);
 		prefs.putInt("Mines", mines);
