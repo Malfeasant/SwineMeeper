@@ -9,7 +9,7 @@ import javafx.scene.input.MouseEvent;
 
 /**
  * A Cell possibly holds a mine, keeps track of its neighbors.  Contains a button.
- * @author mischa
+ * @author Malfeasant
  *
  */
 

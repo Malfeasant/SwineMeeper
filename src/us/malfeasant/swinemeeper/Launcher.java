@@ -6,11 +6,16 @@ import java.util.Collections;
 import javafx.application.Application;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -62,7 +67,19 @@ public class Launcher extends Application {
 		timeLabel.setPadding(new Insets(5));	// keeps it from getting smushed to the edge
 		mineLabel.setPadding(new Insets(5));
 		
-		VBox box = new VBox(topGrid, gameGrid);
+		ToggleGroup group = new ToggleGroup();
+		MenuBar bar = MenuBuilder.build(group);
+		group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			@Override
+			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				if (newValue.getUserData() == Difficulty.CUSTOM) {
+					// TODO pop up a dialog for custom dimensions
+				}
+				Persist.storeDifficulty((Difficulty)(newValue.getUserData()));
+				go.fire();	// changing difficulty starts a new game
+			}
+		});
+		VBox box = new VBox(bar, topGrid, gameGrid);
 		// this is needed to allow the gameGrid to fill the remaining space when resized
 		VBox.setVgrow(gameGrid, Priority.ALWAYS);
 		
