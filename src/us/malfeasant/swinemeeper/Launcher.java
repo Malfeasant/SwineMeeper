@@ -32,6 +32,7 @@ public class Launcher extends Application {
 	private ArrayList<Cell> cells;
 	private int uncovered;	// number of uncovered mines- when this reaches total cells - mines, game must be won
 	private int goal;	// number of non-mined cells
+	private boolean rebuild = true;	// only rebuild the gameboard if the dimensions have changed
 	
 	private final Timer timer = new Timer();
 	private final IntegerProperty mineProp = new SimpleIntegerProperty();
@@ -82,6 +83,7 @@ public class Launcher extends Application {
 		if (diff == Difficulty.CUSTOM) {
 			// TODO pop up a dialog for custom dimensions
 		}
+		rebuild = true;
 		go.fire();	// changing difficulty starts a new game
 	}
 	
@@ -157,9 +159,12 @@ public class Launcher extends Application {
 		
 		state = GameState.READY;
 		
-		stage.sizeToScene();	// Resize window to fit size of gameGrid
-		stage.setMinHeight(stage.getHeight());	// let it be resized, but don't let it get any smaller than this
-		stage.setMinWidth(stage.getWidth());	// (shouldn't this already happen?)
+		if (rebuild) {
+			stage.sizeToScene();	// Resize window to fit size of gameGrid
+			stage.setMinHeight(stage.getHeight());	// let it be resized, but don't let it get any smaller than this
+			stage.setMinWidth(stage.getWidth());	// (shouldn't this already happen?)
+			rebuild = false;
+		}
 	}
 	
 	void click(MineAction a) {	// gameboard has to know about clicks and right clicks to start timer, track flagged mines...
