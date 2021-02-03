@@ -39,4 +39,27 @@ public class Persist {
 	private static int getMines() {
 		return prefs.getInt("Mines", 5);
 	}
+	
+	static class Best {
+		final String name;
+		final int time;
+		Best(String n, int t) {
+			name = n; time = t;
+		}
+	}
+	static Best loadBest(Difficulty diff) {
+		String name = prefs.get("Name" + diff.name(), "Anonymous");
+		int time = prefs.getInt("Time" + diff.name(), 999);
+		return new Best(name, time);
+	}
+	static void clearBest() {
+		for (Difficulty diff : Difficulty.values()) {
+			prefs.remove("Name" + diff.name());
+			prefs.remove("Time" + diff.name());
+		}
+	}
+	static void storeBest(Difficulty diff, Best best) {
+		prefs.put("Name" + diff.name(), best.name);
+		prefs.putInt("Time" + diff.name(), best.time);
+	}
 }

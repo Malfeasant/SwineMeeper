@@ -2,7 +2,9 @@ package us.malfeasant.swinemeeper;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
 
 public class MenuBuilder {
@@ -35,7 +37,10 @@ public class MenuBuilder {
 		cust.setSelected(diff == Difficulty.CUSTOM);
 		cust.setOnAction(e -> game.setDifficulty(Difficulty.CUSTOM));
 		
-		gameMenu.getItems().addAll(easy, med, hard, cust);
+		MenuItem best = new MenuItem("Best Times...");
+		best.setOnAction(e -> BestDialog.showBest());
+		
+		gameMenu.getItems().addAll(easy, med, hard, cust, new SeparatorMenuItem(), best);
 		
 		MenuBar bar = new MenuBar();
 		bar.getMenus().add(gameMenu);
