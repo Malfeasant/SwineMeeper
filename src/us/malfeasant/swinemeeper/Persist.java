@@ -58,8 +58,13 @@ public class Persist {
 			prefs.remove("Time" + diff.name());
 		}
 	}
-	static void storeBest(Difficulty diff, Best best) {
-		prefs.put("Name" + diff.name(), best.name);
-		prefs.putInt("Time" + diff.name(), best.time);
+	static void storeBest(Difficulty diff, int time) {
+		Best existing = loadBest(diff);
+		if (time < existing.time) {
+			String name = BestDialog.newBest(existing.name);
+			prefs.put("Name" + diff.name(), name);
+			prefs.putInt("Time" + diff.name(), time);
+			BestDialog.showBest();
+		}
 	}
 }

@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.GridPane;
 import us.malfeasant.swinemeeper.Persist.Best;
 
@@ -63,5 +64,13 @@ public class BestDialog {
 		});
 		
 		alert.showAndWait();	// we don't care about the response
+	}
+	
+	public static String newBest(String existing) {
+		TextInputDialog dialog = new TextInputDialog(existing);
+		dialog.setTitle("Cromulent!");
+		dialog.setHeaderText(null);
+		dialog.setContentText("You have succeeded where\nothers have failed.\nPlease enter your name.");
+		return dialog.showAndWait().orElse(existing);
 	}
 }

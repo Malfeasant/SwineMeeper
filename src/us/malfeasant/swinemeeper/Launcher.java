@@ -33,6 +33,7 @@ public class Launcher extends Application {
 	private int uncovered;	// number of uncovered mines- when this reaches total cells - mines, game must be won
 	private int goal;	// number of non-mined cells
 	private boolean rebuild = true;	// only rebuild the gameboard if the dimensions have changed
+	private Difficulty diff = Persist.loadDifficulty();
 	
 	private final Timer timer = new Timer();
 	private final IntegerProperty mineProp = new SimpleIntegerProperty();
@@ -78,12 +79,11 @@ public class Launcher extends Application {
 		go.fire();
 	}
 	
-	void setDifficulty(Difficulty diff) {
-		Persist.storeDifficulty(diff);
-		if (diff == Difficulty.CUSTOM) {
-			// TODO pop up a dialog for custom dimensions
-		}
+	void setDifficulty(Difficulty d) {
+		diff = d;
+		Persist.storeDifficulty(diff);	// this method pops up dialog if custom is set
 		rebuild = true;
+
 		go.fire();	// changing difficulty starts a new game
 	}
 	
@@ -95,7 +95,7 @@ public class Launcher extends Application {
 		timer.stop();
 		timer.reset();
 		
-		Difficulty diff = Persist.loadDifficulty();
+//		Difficulty diff = Persist.loadDifficulty();
 		Triple t = Persist.getDimensions(diff);
 		mineProp.set(t.mines);
 		cells = new ArrayList<>(t.width * t.height);
@@ -184,6 +184,9 @@ public class Launcher extends Application {
 					cells.forEach(c -> c.endGame(true));
 					state = GameState.WON;
 					timer.stop();
+					if (diff != Difficulty.CUSTOM) {
+						Persist.storeBest(diff, timer.timeProperty().get());
+					}
 				}
 				break;
 			case KABOOM:
