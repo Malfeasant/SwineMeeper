@@ -19,6 +19,9 @@ public class Cell {
 	private static String WRONG = "X";
 	private static String BOMB = "*";	// 1f4a3?
 	
+	private static String[] COLORS = {
+			"purple", "royalblue", "seagreen", "chocolate", "orange", "orangered", "red", "orchid"
+	};
 	private final Map<Direction, Cell> neighborMap = new EnumMap<>(Direction.class);
 	private final Button btn = new Button(SPACE);
 	private boolean isMine = false;
@@ -63,6 +66,7 @@ public class Cell {
 						clickNeighbors();
 					} else {
 						btn.setText("" + neighborMines);
+						btn.setStyle("-fx-text-fill: " + COLORS[neighborMines - 1]);
 					}
 				}
 			}

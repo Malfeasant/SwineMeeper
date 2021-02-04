@@ -71,6 +71,7 @@ public class Launcher extends Application {
 		VBox box = new VBox(bar, topGrid, gameGrid);
 		// this is needed to allow the gameGrid to fill the remaining space when resized
 		VBox.setVgrow(gameGrid, Priority.ALWAYS);
+		gameGrid.setStyle("-fx-font-size: x-large");
 		
 		Scene scene = new Scene(box);
 		primaryStage.setScene(scene);
