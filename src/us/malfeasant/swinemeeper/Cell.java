@@ -49,10 +49,6 @@ public class Cell {
 	}
 	void action(MouseButton b) {
 		switch (b) {
-		case MIDDLE:	// don't think we care...
-			break;
-		case NONE:	// shouldn't happen...
-			break;
 		case PRIMARY:
 			if (!isFlag) {	// flag suppresses a click
 				if (isMine) {
@@ -75,6 +71,8 @@ public class Cell {
 			isFlag = !isFlag;
 			btn.setText(isFlag ? FLAG : SPACE);
 			game.click(isFlag ? MineAction.MARK : MineAction.UNMARK);
+			break;
+		default:	// middle clicks, anything else ignored...
 			break;
 		}
 	}
