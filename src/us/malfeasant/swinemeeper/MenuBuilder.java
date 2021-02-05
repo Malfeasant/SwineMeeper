@@ -12,7 +12,7 @@ public class MenuBuilder {
 	 * @param game so buttons can call methods on it
 	 * @return a populated MenuBar
 	 */
-	public static MenuBar build(Launcher game) {
+	public static MenuBar build(GameBoard game) {
 		Menu gameMenu = new Menu("Game");
 		Difficulty diff = Persist.loadDifficulty();	// needed so we can set selected on the proper item
 		ToggleGroup group = new ToggleGroup();

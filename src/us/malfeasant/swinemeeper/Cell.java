@@ -27,9 +27,9 @@ public class Cell {
 	private boolean isMine = false;
 	private boolean isFlag = false;
 	
-	private final Launcher game;	// need to have a reference to notify of clicks and
+	private final GameBoard game;	// need to have a reference to notify of clicks and
 	
-	Cell(Launcher g) {
+	Cell(GameBoard g) {
 		game = g;
 		btn.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		btn.setOnMouseClicked(e -> action(e));
