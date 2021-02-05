@@ -70,6 +70,16 @@ public class GameBoard extends Application {
 		VBox.setVgrow(gameGrid, Priority.ALWAYS);
 		gameGrid.setStyle("-fx-font-size: x-large");
 		
+		stage.iconifiedProperty().addListener((prop, then, now) -> {
+			if (now) {
+				timer.stop();	// pause the timer when minimized
+			} else {
+				if (state == GameState.RUNNING) {
+					timer.start();
+				}
+			}
+		});
+		
 		Scene scene = new Scene(box);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("SwineMeeper");
