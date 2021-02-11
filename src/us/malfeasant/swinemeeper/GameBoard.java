@@ -20,6 +20,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class GameBoard extends Application {
+	private static final String GAME_READY = ":)";
+	private static final String GAME_ON = ":|";
+	private static final String GAME_WON = ":D";
+	private static final String GAME_LOST = ":(";
+	
 	private final GridPane gameGrid = new GridPane();
 	private final Label timeLabel = new Label();
 	private final Label mineLabel = new Label();
@@ -35,12 +40,11 @@ public class GameBoard extends Application {
 	private final Timer timer = new Timer();
 	private final IntegerProperty mineProp = new SimpleIntegerProperty();
 	
-	private final Button go = new Button("Go");	// has to be here so it can be "clicked" from event handler
+	private final Button go = new Button(GAME_READY);	// has to be here so it can be "clicked" from event handler
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		stage = primaryStage;
-//		Button go = new Button("Go");
 		go.setOnAction(e -> newGame());
 		
 		timeLabel.textProperty().bind(timer.timeProperty().asString("%03d"));
@@ -103,12 +107,12 @@ public class GameBoard extends Application {
 		timer.stop();
 		timer.reset();
 		
-//		Difficulty diff = Persist.loadDifficulty();
 		Triple t = Persist.getDimensions(diff);
 		mineProp.set(t.mines);
 		cells = new ArrayList<>(t.width * t.height);
 		uncovered = 0;
 		goal = t.height * t.width - t.mines;
+		go.setText(GAME_READY);
 		
 		// allow buttons to resize to fill window:
 		RowConstraints rc = new RowConstraints();
@@ -186,11 +190,13 @@ public class GameBoard extends Application {
 				break;
 			case UNCOVER:
 				state = GameState.RUNNING;
-				timer.start();
+				timer.start();	// does nothing if already running
+				go.setText(GAME_ON);
 				uncovered++;
 				if (uncovered == goal) {
 					cells.forEach(c -> c.endGame(true));
 					state = GameState.WON;
+					go.setText(GAME_WON);
 					timer.stop();
 					if (diff != Difficulty.CUSTOM) {
 						Persist.storeBest(diff, timer.timeProperty().get());
@@ -199,6 +205,7 @@ public class GameBoard extends Application {
 				break;
 			case KABOOM:
 				state = GameState.LOST;
+				go.setText(GAME_LOST);
 				timer.stop();
 				cells.forEach(c -> c.endGame(false));
 				break;
