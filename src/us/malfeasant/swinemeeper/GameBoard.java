@@ -6,6 +6,7 @@ import java.util.Collections;
 import javafx.application.Application;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -20,17 +21,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class GameBoard extends Application {
-	private static final String GAME_READY = ":)";
-	private static final String GAME_ON = ":|";
-	private static final String GAME_WON = ":D";
-	private static final String GAME_LOST = ":(";
-	
 	private final GridPane gameGrid = new GridPane();
 	private final Label timeLabel = new Label();
 	private final Label mineLabel = new Label();
 	private Stage stage;	// need this to resize window after adding/removing children- is there a better way?
-	private GameState state;	// tracks state of game- can be READY (gameboard is built, but waiting for first click),
-	// RUNNING (board has been clicked on, so timers are running), WON (all non-mine cells uncovered), LOST (hit a mine)
+	private final SimpleObjectProperty<GameState> state = new SimpleObjectProperty<>();
 	private ArrayList<Cell> cells;
 	private int uncovered;	// number of uncovered mines- when this reaches total cells - mines, game must be won
 	private int goal;	// number of non-mined cells
@@ -40,12 +35,13 @@ public class GameBoard extends Application {
 	private final Timer timer = new Timer();
 	private final IntegerProperty mineProp = new SimpleIntegerProperty();
 	
-	private final Button go = new Button(GAME_READY);	// has to be here so it can be "clicked" from event handler
+	private final Button go = new Button();	// has to be here so it can be "clicked" from event handler
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		stage = primaryStage;
 		go.setOnAction(e -> newGame());
+		go.textProperty().bind(state.asString());
 		
 		timeLabel.textProperty().bind(timer.timeProperty().asString("%03d"));
 		mineLabel.textProperty().bind(mineProp.asString("%03d"));
@@ -64,7 +60,7 @@ public class GameBoard extends Application {
 		topGrid.getColumnConstraints().addAll(ccL, ccC, ccR);
 		topGrid.add(mineLabel, 0, 0);
 		topGrid.add(go, 1, 0);
-		topGrid.add(timeLabel, 2, 0);	// oops- had these backwards
+		topGrid.add(timeLabel, 2, 0);
 		timeLabel.setPadding(new Insets(5));	// keeps it from getting smushed to the edge
 		mineLabel.setPadding(new Insets(5));
 		
@@ -78,7 +74,7 @@ public class GameBoard extends Application {
 			if (now) {
 				timer.stop();	// pause the timer when minimized
 			} else {
-				if (state == GameState.RUNNING) {
+				if (state.get() == GameState.RUNNING) {
 					timer.start();
 				}
 			}
@@ -112,7 +108,6 @@ public class GameBoard extends Application {
 		cells = new ArrayList<>(t.width * t.height);
 		uncovered = 0;
 		goal = t.height * t.width - t.mines;
-		go.setText(GAME_READY);
 		
 		// allow buttons to resize to fill window:
 		RowConstraints rc = new RowConstraints();
@@ -169,7 +164,7 @@ public class GameBoard extends Application {
 			}
 		}
 		
-		state = GameState.READY;
+		state.set(GameState.READY);
 		
 		if (rebuild) {
 			stage.sizeToScene();	// Resize window to fit size of gameGrid
@@ -180,7 +175,7 @@ public class GameBoard extends Application {
 	}
 	
 	void click(MineAction a) {	// gameboard has to know about clicks and right clicks to start timer, track flagged mines...
-		if (state.allowClicks()) {
+		if (state.get().allowClicks()) {
 			switch (a) {
 			case MARK:	// these alone do not start the game
 				mineProp.set(mineProp.get() - 1);	// goes negative if more marks than mines, that's ok
@@ -189,14 +184,12 @@ public class GameBoard extends Application {
 				mineProp.set(mineProp.get() + 1);
 				break;
 			case UNCOVER:
-				state = GameState.RUNNING;
+				state.set(GameState.RUNNING);
 				timer.start();	// does nothing if already running
-				go.setText(GAME_ON);
 				uncovered++;
 				if (uncovered == goal) {
 					cells.forEach(c -> c.endGame(true));
-					state = GameState.WON;
-					go.setText(GAME_WON);
+					state.set(GameState.WON);
 					timer.stop();
 					if (diff != Difficulty.CUSTOM) {
 						Persist.storeBest(diff, timer.timeProperty().get());
@@ -204,8 +197,7 @@ public class GameBoard extends Application {
 				}
 				break;
 			case KABOOM:
-				state = GameState.LOST;
-				go.setText(GAME_LOST);
+				state.set(GameState.LOST);
 				timer.stop();
 				cells.forEach(c -> c.endGame(false));
 				break;
