@@ -88,7 +88,7 @@
 	
 		<fx:application id="fxApplication"
 			name="SwineMeeper"
-			mainClass="er"
+			mainClass="us.malfeasant.swinemeeper.Launcher"
 		/>
 	
 		<mkdir dir="build/classes/META-INF" />
@@ -102,7 +102,7 @@
 			<fx:resources refid="appRes"/>
 	
 			<manifest>
-				<attribute name="Implementation-Vendor" value="Nobody"/>
+				<attribute name="Implementation-Vendor" value="Malfeasant"/>
 				<attribute name="Implementation-Title" value="SwineMeeper"/>
 				<attribute name="Implementation-Version" value="0.1"/>
 				<attribute name="JavaFX-Feature-Proxy" value="None"/>
