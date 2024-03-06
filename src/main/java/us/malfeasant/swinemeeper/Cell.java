@@ -17,7 +17,7 @@ public class Cell {
 	private static String SPACE = "\u2003";	// fat space
 	private static String FLAG = "\u2691";	// 1f6a9?
 	private static String WRONG = "X";
-	private static String BOMB = "*";	// 1f4a3?
+	private static String BOMB = "\ud83d\udca3";	// 1f4a3?
 	
 	private static String[] COLORS = {
 			"purple", "royalblue", "seagreen", "chocolate", "orange", "orangered", "red", "orchid"

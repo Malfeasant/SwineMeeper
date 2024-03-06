@@ -42,9 +42,12 @@ public class GameBoard extends Application {
 		stage = primaryStage;
 		go.setOnAction(e -> newGame());
 		go.textProperty().bind(state.asString());
+		go.styleProperty().set("-fx-font-size: 20;");
 		
 		timeLabel.textProperty().bind(timer.timeProperty().asString("%03d"));
 		mineLabel.textProperty().bind(mineProp.asString("%03d"));
+		timeLabel.styleProperty().set("-fx-font-size: 20;");
+		mineLabel.styleProperty().set("-fx-font-size: 20;");
 		
 		GridPane topGrid = new GridPane();	// counters & go button
 		// All this is needed to keep counters at the outside edges of the bar and go button centered:
