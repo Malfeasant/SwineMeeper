@@ -16,4 +16,5 @@ hs_err_pid*
 /build
 /target
 /.settings
+/.vscode/
 /dependency-reduced-pom.xml
