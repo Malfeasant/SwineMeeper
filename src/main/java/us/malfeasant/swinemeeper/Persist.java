@@ -3,7 +3,7 @@ package us.malfeasant.swinemeeper;
 import java.util.prefs.Preferences;
 
 public class Persist {
-	private static Preferences prefs = Preferences.userNodeForPackage(Persist.class);
+	private static final Preferences prefs = Preferences.userNodeForPackage(Persist.class);
 	
 	public static Difficulty loadDifficulty() {
 		Difficulty d = Difficulty.valueOf(prefs.get(Difficulty.class.getSimpleName(), Difficulty.EASY.name()));

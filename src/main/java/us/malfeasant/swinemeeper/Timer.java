@@ -5,7 +5,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
 public class Timer extends AnimationTimer {
-	private static long NANOFACTOR = 1000000000L;
+	private static final long NANOFACTOR = 1000000000L;
 	private long last;
 	private long remainder;
 	private final IntegerProperty timeProp;
