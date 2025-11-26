@@ -7,8 +7,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>11</maven.compiler.release>
-        <jfx.version>11</jfx.version>
+        <maven.compiler.release>25</maven.compiler.release>
+        <jfx.version>25</jfx.version>
         <mainModuleClass>us.malfeasant.swinemeeper/us.malfeasant.swinemeeper.GameBoard</mainModuleClass>
         <mainClassName>us.malfeasant.swinemeeper.Launcher</mainClassName>
     </properties>
